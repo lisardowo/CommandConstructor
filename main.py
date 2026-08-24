@@ -5,7 +5,15 @@ import sys
 import termios
 import tty
 
-def read_single_key():
+
+def printInRaw(currentString: str):
+    strlen = len(currentString)
+    i = 0
+    while i < strlen:
+        print(f"\r\n{currentString[i]}", end = "", flush = True)
+        i+=1
+
+def readChar():
   
     fd = sys.stdin.fileno() # save fd of stdin
     
@@ -17,23 +25,24 @@ def read_single_key():
     tty.setraw(fd) # Switch the terminal to raw mode
     
     print("Raw mode active. Press any key (or 'q' to quit)...", end="", flush=True)
-    reconstructedString = []
+    reconstructedString = ""
     while True:
         
         char = sys.stdin.read(1)
-        if char == 'q':
-         #   print("\r\nExiting raw mode...")
-            break
-        if char == '\r':
+        match char:
+            case _ if char == 'q':
+                break #print("\r\nExiting raw mode...")
+            case _:
             #print("space!", end="", flush=True)
-            continue
-            reconstructedString += char 
+                reconstructedString += char 
         #print(f"\r\n You pressed: {repr(char)}", end="", flush=True)
-        reconstructedString += char
-        print(f"\r\n{"".join(reconstructedString)}", end = "", flush = True)
+       
+        printInRaw(reconstructedString)
+        if "nmap" in reconstructedString:
+             printInRaw(reconstructedString)
     # Restore previous settings
     termios.tcsetattr(fd, termios.TCSADRAIN, previousSettings)
 
 if __name__ == "__main__":
 
-    read_single_key()
+    readChar()
