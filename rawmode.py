@@ -4,7 +4,7 @@
 import sys
 import termios
 import tty
-
+import commandConstructor
 
 def printInRaw(currentString: str):
     strlen = len(currentString)
@@ -33,13 +33,14 @@ def readTerminal():
             case _ if char == '\x11':
                 break 
             case _:
-            
                 reconstructedString += char 
+        print(f"/r/n{char}", end = "", flush = True)
         printInRaw(reconstructedString)
+        
+        
         match reconstructedString:
             case _ if "nmap" in reconstructedString:
-                print("nmap", end="", flush=True)
-
+                commandConstructor.constructNmap()
     
     # Restore previous settings
     termios.tcsetattr(fd, termios.TCSADRAIN, previousSettings)
