@@ -3,4 +3,4 @@ import rawmode
 
 if __name__ == "__main__":
 
-    rawmode.readChar()
+    rawmode.readTerminal()

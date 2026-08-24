@@ -13,7 +13,7 @@ def printInRaw(currentString: str):
         print(f"\r\033[K{currentString}", end="", flush=True)
         i+=1
 
-def readChar():
+def readTerminal():
   
     fd = sys.stdin.fileno() # save fd of stdin
     
@@ -31,14 +31,15 @@ def readChar():
         char = sys.stdin.read(1)
         match char:
             case _ if char == '\x11':
-                break #print("\r\nExiting raw mode...")
+                break 
             case _:
-            #print("space!", end="", flush=True)
+            
                 reconstructedString += char 
-        #print(f"\r\n You pressed: {repr(char)}", end="", flush=True)
-       
         printInRaw(reconstructedString)
-        if "nmap" in reconstructedString:
-             printInRaw(reconstructedString)
+        match reconstructedString:
+            case _ if "nmap" in reconstructedString:
+                print("nmap", end="", flush=True)
+
+    
     # Restore previous settings
     termios.tcsetattr(fd, termios.TCSADRAIN, previousSettings)

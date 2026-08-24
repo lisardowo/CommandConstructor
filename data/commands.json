@@ -1,0 +1,86 @@
+{
+  "command": "nmap",
+  "description": "Network exploration tool and security / port scanner",
+  "categories": [
+    {
+      "name": "Host Discovery",
+      "flags": [
+        { "flag": "-sL", "name": "List Scan", "requires_value": false, "description": "Lista los objetivos a escanear sin enviar paquetes a los hosts." },
+        { "flag": "-sn", "name": "Ping Scan", "requires_value": false, "description": "Desactiva el escaneo de puertos. Solo determina si el host está vivo." },
+        { "flag": "-Pn", "name": "No Ping", "requires_value": false, "description": "Trata todos los hosts como online (útil para saltar firewalls que bloquean ICMP)." },
+        { "flag": "-PS", "name": "TCP SYN Ping", "requires_value": true, "value_placeholder": "portlist", "description": "Descubrimiento de host enviando paquetes TCP SYN a los puertos indicados." },
+        { "flag": "-PA", "name": "TCP ACK Ping", "requires_value": true, "value_placeholder": "portlist", "description": "Descubrimiento de host enviando paquetes TCP ACK." },
+        { "flag": "-PU", "name": "UDP Ping", "requires_value": true, "value_placeholder": "portlist", "description": "Descubrimiento de host enviando paquetes UDP." },
+        { "flag": "-PR", "name": "ARP Ping", "requires_value": false, "description": "Descubrimiento súper rápido en redes locales usando ARP." }
+      ]
+    },
+    {
+      "name": "Scan Techniques",
+      "flags": [
+        { "flag": "-sS", "name": "TCP SYN Scan", "requires_value": false, "description": "Escaneo sigiloso. No completa el handshake TCP (requiere root)." },
+        { "flag": "-sT", "name": "TCP Connect Scan", "requires_value": false, "description": "Escaneo ruidoso. Completa el handshake TCP." },
+        { "flag": "-sU", "name": "UDP Scan", "requires_value": false, "description": "Escaneo de puertos UDP (DNS, SNMP, DHCP)." },
+        { "flag": "-sN", "name": "TCP Null Scan", "requires_value": false, "description": "Envía paquetes sin ningún bit TCP activado." },
+        { "flag": "-sF", "name": "TCP FIN Scan", "requires_value": false, "description": "Envía paquetes con solo el bit FIN activado." },
+        { "flag": "-sX", "name": "Xmas Scan", "requires_value": false, "description": "Activa los bits FIN, PSH y URG." },
+        { "flag": "-sA", "name": "TCP ACK Scan", "requires_value": false, "description": "Útil para mapear reglas de firewalls, no determina puertos abiertos." }
+      ]
+    },
+    {
+      "name": "Port Specification and Execution Order",
+      "flags": [
+        { "flag": "-p", "name": "Port Range", "requires_value": true, "value_placeholder": "port ranges", "description": "Especifica los puertos a escanear (ej. -p 80,443 o -p 1-1000)." },
+        { "flag": "-F", "name": "Fast Mode", "requires_value": false, "description": "Escanea solo los 100 puertos más comunes." },
+        { "flag": "-r", "name": "Sequential Scan", "requires_value": false, "description": "Escanea los puertos de forma secuencial, no aleatoria." },
+        { "flag": "--top-ports", "name": "Top Ports", "requires_value": true, "value_placeholder": "number", "description": "Escanea los N puertos con mayor probabilidad de estar abiertos." }
+      ]
+    },
+    {
+      "name": "Service/Version & OS Detection",
+      "flags": [
+        { "flag": "-sV", "name": "Version Detection", "requires_value": false, "description": "Interroga los puertos abiertos para determinar el servicio y la versión." },
+        { "flag": "--version-intensity", "name": "Version Intensity", "requires_value": true, "value_placeholder": "0-9", "description": "Establece la intensidad de las pruebas de versión (0=ligero, 9=todas las pruebas)." },
+        { "flag": "-O", "name": "OS Detection", "requires_value": false, "description": "Activa la detección agresiva del sistema operativo." },
+        { "flag": "--osscan-limit", "name": "Limit OS Scan", "requires_value": false, "description": "Limita la detección de OS a objetivos prometedores (al menos un puerto abierto y uno cerrado)." }
+      ]
+    },
+    {
+      "name": "Script Scan",
+      "flags": [
+        { "flag": "-sC", "name": "Default Scripts", "requires_value": false, "description": "Equivalente a --script=default." },
+        { "flag": "--script", "name": "Custom Scripts", "requires_value": true, "value_placeholder": "lua scripts", "description": "Ejecuta scripts NSE específicos (ej. vuln, auth, discovery)." },
+        { "flag": "--script-args", "name": "Script Arguments", "requires_value": true, "value_placeholder": "args", "description": "Pasa argumentos a los scripts NSE." }
+      ]
+    },
+    {
+      "name": "Timing and Performance",
+      "flags": [
+        { "flag": "-T0", "name": "Paranoid", "requires_value": false, "description": "Extremadamente lento, evasión de IDS." },
+        { "flag": "-T3", "name": "Normal", "requires_value": false, "description": "Comportamiento por defecto." },
+        { "flag": "-T4", "name": "Aggressive", "requires_value": false, "description": "Asume una red rápida y confiable." },
+        { "flag": "-T5", "name": "Insane", "requires_value": false, "description": "Extremadamente agresivo, puede perder resultados." },
+        { "flag": "--min-rate", "name": "Minimum Rate", "requires_value": true, "value_placeholder": "number", "description": "Asegura el envío de un mínimo de X paquetes por segundo." }
+      ]
+    },
+    {
+      "name": "Firewall/IDS Evasion and Spoofing",
+      "flags": [
+        { "flag": "-f", "name": "Fragment Packets", "requires_value": false, "description": "Fragmenta los paquetes IP para dificultar la inspección de los firewalls." },
+        { "flag": "-D", "name": "Decoys", "requires_value": true, "value_placeholder": "decoy1,decoy2,ME", "description": "Oculta el escaneo con IPs señuelo." },
+        { "flag": "-S", "name": "Spoof Source Address", "requires_value": true, "value_placeholder": "IP_Address", "description": "Falsifica la dirección IP de origen." },
+        { "flag": "-e", "name": "Use Interface", "requires_value": true, "value_placeholder": "iface", "description": "Especifica la interfaz de red a utilizar (ej. eth0, wg0)." },
+        { "flag": "--source-port", "name": "Spoof Source Port", "requires_value": true, "value_placeholder": "port", "description": "Falsifica el puerto de origen (ej. usar el 53 para saltar reglas)." }
+      ]
+    },
+    {
+      "name": "Output",
+      "flags": [
+        { "flag": "-oN", "name": "Normal Output", "requires_value": true, "value_placeholder": "file", "description": "Guarda la salida en formato normal." },
+        { "flag": "-oX", "name": "XML Output", "requires_value": true, "value_placeholder": "file", "description": "Guarda la salida en formato XML (ideal para parseo automatizado)." },
+        { "flag": "-oG", "name": "Grepable Output", "requires_value": true, "value_placeholder": "file", "description": "Guarda la salida en formato 'grepable'." },
+        { "flag": "-oA", "name": "All Formats", "requires_value": true, "value_placeholder": "basename", "description": "Guarda la salida en los 3 formatos principales a la vez." },
+        { "flag": "-v", "name": "Verbose", "requires_value": false, "description": "Aumenta el nivel de detalle en pantalla." }
+      ]
+    }
+  ]
+}
