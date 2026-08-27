@@ -47,12 +47,14 @@ No external dependencies are required. UnixForge uses Python's standard `tty` an
  3. The cursor moves from the input box to other positions 
  4. Deactivate used commands/change
  5. add Comand Desc Seed view 
+ 6. nmap does not render 2 categories, prolly because it does not fill the whole column
+ 7. two chars commands are being separated
 
 
 ```bash
 git clone [https://github.com/lisardowo/CommandConstructor](https://github.com/lisardowo/CommandConstructor)
-cd unixforge
-chmod +x unixforge.py
+cd COMANDCONS
+chmod +x main.py
 ```
 
 ```
@@ -75,12 +77,12 @@ chmod +x unixforge.py
 
 Prolly making a repo alone for this one:
 
-bubbletea (golang) inspired framework to create TUI using the elm architecture. Pretty rough, ugly, work in progress
+bubbletea (golang) inspired framework to create TUIs using the elm architecture. Pretty rough, ugly, work in progress
 
 to run the smol demo
 
 ```bash
-#on root directory
+#on root directory for the project
 python -m Mamushi.demo
 
 ```

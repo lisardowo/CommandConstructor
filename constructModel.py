@@ -1,11 +1,12 @@
 
+from Mamushi.colors import Colors
 import itertools
 
 from Mamushi.msg import KeyMsg
 from Mamushi import commands
 from getMenu import loadCommands
 
-COLUMN_WIDTH = 40
+COLUMN_WIDTH = 60
 
 class constructorModel:
    
@@ -46,7 +47,8 @@ class constructorModel:
         lines = [f"> {self.userinput}", ""]
         
         if not self.matchedCommands:
-            lines.append("Command not recognized !")
+            
+            lines.append(Colors.applyColor("Command not recognized !", Colors.BRIGHT_RED))
             
             return "\n".join(lines)
         
@@ -79,8 +81,8 @@ class constructorModel:
         
         if self.selectedFlags:
             for f in self.selectedFlags:
-                flagsStr = " ".join(f.get("flag", ""))
-                lines.append(f"{self.matchedCommands} {flagsStr}")
+                flagsStr = "".join(f.get("flag", ""))
+            lines.append(f"> {self.matchedCommands} {flagsStr} ") #Construct the output command
         
         return "\n".join(lines)
     
@@ -137,7 +139,7 @@ class constructorModel:
         idx = startIndex
         for flag in category.get("flags", []):
             tag = flag.get("name", "")
-            #flag = flag.get("flag", "")
-            lines.append(f"{idx}) {tag}")
+            flag = flag.get("flag", "")
+            lines.append(f"{idx}) {tag} - ({flag})")
             idx += 1
         return lines, idx
