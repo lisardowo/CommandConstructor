@@ -4,6 +4,7 @@ from .model import Model, BaseModel
 from .msg import Msg, KeyMsg, QuitMsg
 from . import terminal
 from . import commands
+from . import colors
 
 __all__ = [
     "Renderer",
@@ -14,5 +15,6 @@ __all__ = [
     "KeyMsg",
     "QuitMsg",
     "terminal",
-    "commands"
+    "commands",
+    "colors"
 ]

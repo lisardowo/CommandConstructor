@@ -41,14 +41,15 @@ Working on them:
 No external dependencies are required. UnixForge uses Python's standard `tty` and `termios` libraries for raw mode terminal manipulation.
 
 ## Bugs
-
- 1. Only shows up to 2 flags for the command
+ 
+ 1. Only shows one flags for the command and each new option selected generates the command again with just that flag
  2. Commands appear repeated
  3. The cursor moves from the input box to other positions 
  4. Deactivate used commands/change
- 5. add Comand Desc Seed view 
- 6. nmap does not render 2 categories, prolly because it does not fill the whole column
- 7. two chars commands are being separated
+ 5. add saved Command Description Seed view 
+~~ 6. nmap does not render 2 categories, prolly because it does not fill the whole column~~
+ 6.1 following up the sixth ticket, the cuantity of categories that are rendered depends on the size of the terminal (tiny terminal renders 2 or so while full size renders all the categories) 
+ ~~7. two chars commands are being separated~~
 
 
 ```bash
