@@ -1,6 +1,6 @@
-
-import rawmode
+from Mamushi.program import Program
+from constructModel import constructorModel
 
 if __name__ == "__main__":
-
-    rawmode.readTerminal()
+    model = constructorModel()
+    Program(model).run()

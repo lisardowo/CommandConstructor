@@ -38,10 +38,54 @@ Working on them:
 *   **Extraction:** Pulling public keys from private keys or certs.
 
 ## Installation
-
 No external dependencies are required. UnixForge uses Python's standard `tty` and `termios` libraries for raw mode terminal manipulation.
+
+## Bugs
+
+ 1. Only shows up to 2 flags for the command
+ 2. Commands appear repeated
+ 3. The cursor moves from the input box to other positions 
+ 4. Deactivate used commands/change
+ 5. add Comand Desc Seed view 
+
 
 ```bash
 git clone [https://github.com/lisardowo/CommandConstructor](https://github.com/lisardowo/CommandConstructor)
 cd unixforge
 chmod +x unixforge.py
+```
+
+```
+> IN
+
+    Tipo        Tipo    Tipo
+    1)          1)
+    2)          2)
+    3)          3)
+
+
+```
+
+
+> OUT
+
+    Saved                                  Desc
+
+# About mamushi 
+
+Prolly making a repo alone for this one:
+
+bubbletea (golang) inspired framework to create TUI using the elm architecture. Pretty rough, ugly, work in progress
+
+to run the smol demo
+
+```bash
+#on root directory
+python -m Mamushi.demo
+
+```
+
+## sum bugs
+
+ 1. Quit command is not being recognized
+ 2. add colors 
