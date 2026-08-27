@@ -24,7 +24,7 @@ def readTerminal():
       
     tty.setraw(fd) # Switch the terminal to raw mode
     
-    print("Raw mode active. Press any key (or 'q' to quit)...", end="", flush=True)
+    print("> ", end="", flush=True)
     reconstructedString = ""
     while True:
         
@@ -34,8 +34,8 @@ def readTerminal():
                 break 
             case _:
                 reconstructedString += char 
-        print(f"/r/n{char}", end = "", flush = True)
-        printInRaw(reconstructedString)
+        print(f"{char}", end = "", flush = True)
+        #printInRaw(reconstructedString)
         
         
         match reconstructedString:

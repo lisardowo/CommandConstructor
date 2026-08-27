@@ -22,10 +22,12 @@ def loadCommands():
     
     return commandDatabase
 
+
+
 if __name__ == "__main__":
     
     print("[DEBUG] db: \n")
     db = loadCommands()
-    
+    print(type(db))
     print(f"commands: {list(db["nmap"].values())}")
     
