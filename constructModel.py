@@ -14,6 +14,7 @@ class constructorModel:
    
     def __init__(self): # constructor of the object
         self.userinput = ""
+        self.cursorPosition = 0
         self.matchedCommands = None
         self.selectedFlags = []
         self.commandDatabase = {}
@@ -32,16 +33,22 @@ class constructorModel:
       
         match msg.type:
             case keyType.BACKSPACE:
-                self.userinput = self.userinput[:-1]
-            case keyType.SPACE:
-                self.userinput += ' '
+                if self.cursorPosition > 0:
+                    self.userinput = (self.userinput[:self.cursorPosition - 1] + self.userinput[self.cursorPosition:]) 
+                    self.cursorPosition -=1
+            case keyType.SPACE: 
+                self.insertInCursor(' ')
             case keyType.RUNES:
-                self.userinput += msg.runes
+                self.insertInCursor(msg.runes)
             case keyType.ENTER:
                 if self.matchedCommands:
                     self.saveCommand() #TODO create func to save command
-            
-
+            case keyType.LEFT:
+                self.cursorPosition = max(0, self.cursorPosition - 1)
+                return None
+            case keyType.RIGHT:
+                self.cursorPosition = min(len(self.userinput), self.cursorPosition + 1)
+                return None
             
         self._recompute()
         return None
@@ -140,7 +147,10 @@ class constructorModel:
         description = self.commandDatabase.get(self.matchedCommands, {}).get("description", "")
         
         self.savedCommands.append({"command": commandStr, "description": description,})
-        
+    
+    def insertInCursor(self, toInsert:str):
+        self.userinput = self.userinput[: self.cursorPosition] + toInsert + self.userinput[self.cursorPosition :]
+        self.cursorPosition += len(toInsert)
 
     @staticmethod
     

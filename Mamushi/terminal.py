@@ -3,7 +3,7 @@ import sys
 ESC = "\x1b"
 
 def hideCursor():
-    sys.stdout.write(f"{ESC}[?251")
+    sys.stdout.write(f"{ESC}[?25l")
 
 def showCursor():
     sys.stdout.write(f"{ESC}[?25h")
@@ -23,3 +23,6 @@ def enterProgramScreen():
     
 def exitProgramScreen():
     sys.stdout.write(f"{ESC}[?1049l")
+
+def reverseCursor(text: str):
+    return f"{ESC}[7m{text}{ESC}[0m"

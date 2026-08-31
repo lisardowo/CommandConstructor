@@ -24,7 +24,7 @@ class Renderer:
         #Returns terminal to std configuration
         terminal.showCursor()
         if self._useProgramScreen:
-            terminal.exitProgramScreen
+            terminal.exitProgramScreen()
         sys.stdout.flush()
         self._started = False
         

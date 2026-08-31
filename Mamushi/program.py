@@ -48,7 +48,7 @@ class Program:
             self.renderer.render(self.model.view())
             
             while True:
-                msg = read_key(sys.stdin)
+                msg = read_key()
  
                 shouldContinue = self._dispatch(msg)
                 self.renderer.render(self.model.view())
