@@ -26,7 +26,7 @@ class Renderer:
         if self._useProgramScreen:
             terminal.exitProgramScreen()
         sys.stdout.flush()
-        self._started = False
+        self._isStarted = False
         
     def render(self, frame: str):
         if not self._isStarted:

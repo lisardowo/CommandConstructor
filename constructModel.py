@@ -1,5 +1,6 @@
 
 
+from Mamushi import terminal
 from Mamushi.msg import keyType
 import itertools
 
@@ -65,6 +66,9 @@ class constructorModel:
         commandData = self.commandDatabase[self.matchedCommands]
         categories = commandData.get("categories", [])
         
+        for flag in self.selectedFlags:
+            selectedFlagKeys = {flag.get("flag", "")}
+        
         globalIndex = 1
         blocks = []
         for category in categories: 
@@ -86,7 +90,7 @@ class constructorModel:
                     rightLine = categoryRight[i]
                 else:
                     rightLine = ""
-                lines.append(f"{leftLine.ljust(COLUMN_WIDTH)}{rightLine}")
+                lines.append(f"{leftLine.ljust(COLUMN_WIDTH)}{rightLine}") # todo update this to render sum colors
             lines.append("")
         
         if self.selectedFlags:
@@ -101,6 +105,12 @@ class constructorModel:
                 if saved.get("description"):
                     lines.append(f" {saved['description']}")
         return "\n".join(lines)
+    
+    def _renderInputLine(self) -> str:
+        before = self.userinput[: self.cursorPosition]
+        underCursor = self.userinput[self.cursorPosition : self.cursorPosition + 1] or " "
+        after = self.userinput[self.cursorPosition + 1:]
+        return f"> {before}{terminal.reverseCursor(underCursor)}{after}"
     
     def _reset(self):
         
@@ -131,13 +141,14 @@ class constructorModel:
         allFlags = self._flattenFlags(self.commandDatabase[self.matchedCommands])
         
         selected = []
+        seenIndices = set()
         
         for token in tokens[1:]: #from 2nd element on because 0 is the command
             if token.isdigit():
                 idx = int(token) - 1
                 if 0 <= idx < len(allFlags):
                     selected.append(allFlags[idx]) # n from input should be an n in the range of all the flags of the command
-        
+                    seenIndices.add(idx)
         self.selectedFlags = selected
     
     def saveCommand(self):
