@@ -4,4 +4,4 @@ from .msg import Msg, quitMsg
 Cmd = Callable[[], Optional[Msg]]
 
 def quit() -> Cmd:
-    return lambda: quitMsg
+    return lambda: quitMsg()
