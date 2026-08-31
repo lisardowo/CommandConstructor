@@ -38,7 +38,7 @@ Working on them:
 *   **Extraction:** Pulling public keys from private keys or certs.
 
 ## Installation
-No external dependencies are required. UnixForge uses Python's standard `tty` and `termios` libraries for raw mode terminal manipulation.
+No external dependencies are required. The project uses Python's standard `tty` and `termios` libraries for raw mode terminal manipulation.
 
 ## Bugs
  
@@ -51,15 +51,16 @@ No external dependencies are required. UnixForge uses Python's standard `tty` an
  6.1 following up the sixth ticket, the cuantity of categories that are rendered depends on the size of the terminal (tiny terminal renders 2 or so while full size renders all the categories) 
  ~~7. two chars commands are being separated~~
 
+## Setup
 
 ```bash
-git clone [https://github.com/lisardowo/CommandConstructor](https://github.com/lisardowo/CommandConstructor)
-cd COMANDCONS
+git clone https://github.com/lisardowo/CommandConstructor
+cd CommandConstructo
 chmod +x main.py
 ```
 
 ```
-> IN
+> IN <command>
 
     Tipo        Tipo    Tipo
     1)          1)
