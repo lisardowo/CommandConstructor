@@ -3,8 +3,9 @@ import tty
 import termios
 
 from .render import Renderer
-from .msg import Msg, KeyMsg, QuitMsg
+from .msg import Msg, keyMsg, quitMsg
 from .model import Model
+from .keys import read_key
 
 class Program:
     
@@ -14,7 +15,7 @@ class Program:
     
     def _dispatch(self, msg: Msg) -> bool:
         
-        if isinstance(msg, QuitMsg):
+        if isinstance(msg, quitMsg):
             return False # if receives a quit msg returns a signal to terminate the program
         
         cmd = self.model.update(msg)
@@ -47,13 +48,14 @@ class Program:
             self.renderer.render(self.model.view())
             
             while True:
-                char = sys.stdin.read(1)
-                shouldContinue = self._dispatch(KeyMsg(char))
-                
+                msg = read_key(sys.stdin)
+ 
+                shouldContinue = self._dispatch(msg)
                 self.renderer.render(self.model.view())
-                
+ 
                 if not shouldContinue:
                     break
+
         
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, previousSettings) # restart settings

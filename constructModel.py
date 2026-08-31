@@ -1,8 +1,10 @@
 
-from Mamushi.colors import Colors
+
+from Mamushi.msg import keyType
 import itertools
 
-from Mamushi.msg import KeyMsg
+from Mamushi.colors import Colors
+from Mamushi.msg import keyMsg
 from Mamushi import commands
 from getMenu import loadCommands
 
@@ -15,30 +17,31 @@ class constructorModel:
         self.matchedCommands = None
         self.selectedFlags = []
         self.commandDatabase = {}
-    
+        self.savedCommands = []
+        
     def init(self): # loads the DB to memory
         self.commandDatabase = loadCommands()
         return None
     
     def update(self, msg):
-        if not isinstance(msg, KeyMsg):
+        if not isinstance(msg, keyMsg):
             return None
         
-        char = msg.char
-        
-        if char == "\x11":
+        if msg.is_ctrl('q'):
             return commands.quit()
-        
-        if char in ("\r", "\n"):
+      
+        match msg.type:
+            case keyType.BACKSPACE:
+                self.userinput = self.userinput[:-1]
+            case keyType.SPACE:
+                self.userinput += ' '
+            case keyType.RUNES:
+                self.userinput += msg.runes
+            case keyType.ENTER:
+                if self.matchedCommands:
+                    self.saveCommand() #TODO create func to save command
             
-            if self.matchedCommands:
-                self.saveCommand() #TODO create func to save command
-            
-            return None
-        if char == "\x7f":
-            self.userinput = self.userinput[:-1]
-        elif char.isprintable():
-            self.userinput += char
+
             
         self._recompute()
         return None
@@ -80,10 +83,16 @@ class constructorModel:
             lines.append("")
         
         if self.selectedFlags:
-            for f in self.selectedFlags:
-                flagsStr = "".join(f.get("flag", ""))
+            
+            flagsStr = " ".join(f.get("flag", "") for f in self.selectedFlags)
             lines.append(f"> {self.matchedCommands} {flagsStr} ") #Construct the output command
         
+        if self.savedCommands:
+            lines.append(" -- Saved Commands --")
+            for saved in self.savedCommands:
+                lines.append(f" {saved['command']}")
+                if saved.get("description"):
+                    lines.append(f" {saved['description']}")
         return "\n".join(lines)
     
     def _reset(self):
@@ -124,6 +133,15 @@ class constructorModel:
         
         self.selectedFlags = selected
     
+    def saveCommand(self):
+        flagsStr = " ".join(f.get("flag", "") for f in self.selectedFlags)
+        commandStr = f"{self.matchedCommands} {flagsStr}".strip()
+        
+        description = self.commandDatabase.get(self.matchedCommands, {}).get("description", "")
+        
+        self.savedCommands.append({"command": commandStr, "description": description,})
+        
+
     @staticmethod
     
     def _flattenFlags(commandData: dict):

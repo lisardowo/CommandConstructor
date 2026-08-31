@@ -5,7 +5,7 @@ claude is CLAVE
 """
  
 from .model import BaseModel
-from .msg import KeyMsg
+from .msg import keyMsg
 from . import commands
 from .program import Program
  
@@ -15,7 +15,7 @@ class CounterModel(BaseModel):
         self.contador = 0
  
     def update(self, msg):
-        if isinstance(msg, KeyMsg):
+        if isinstance(msg, keyMsg):
             if msg.char == "q":
                 return commands.quit()
             elif msg.char == "j":
