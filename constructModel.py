@@ -66,8 +66,8 @@ class constructorModel:
         commandData = self.commandDatabase[self.matchedCommands]
         categories = commandData.get("categories", [])
         
-        for flag in self.selectedFlags:
-            selectedFlagKeys = {flag.get("flag", "")}
+        
+        selectedFlagKeys = {flag.get("flag", "") for flag in self.selectedFlags}
         
         globalIndex = 1
         blocks = []
