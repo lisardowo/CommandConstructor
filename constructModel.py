@@ -148,8 +148,10 @@ class constructorModel:
             if token.isdigit():
                 idx = int(token) - 1
                 if 0 <= idx < len(allFlags):
-                    selected.append(allFlags[idx]) # n from input should be an n in the range of all the flags of the command
-                    seenIndices.add(idx)
+                    if idx not in seenIndices:
+                        selected.append(allFlags[idx]) # n from input should be an n in the range of all the flags of the command
+                        seenIndices.add(idx)
+        
         self.selectedFlags = selected
     
     def saveCommand(self):
@@ -184,7 +186,7 @@ class constructorModel:
             
             if flag in selectedFlags:
                 label = Colors.strikethrough(Colors.applyColor(label, Colors.RED))
-            
+                
             lines.append(label)
             idx += 1
         return lines, idx
