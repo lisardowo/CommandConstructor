@@ -148,11 +148,14 @@ class constructorModel:
             if token.isdigit():
                 idx = int(token) - 1
                 if 0 <= idx < len(allFlags):
-                    if idx not in seenIndices:
+                    if idx not in seenIndices: #TODO or _repeatable(idx):
                         selected.append(allFlags[idx]) # n from input should be an n in the range of all the flags of the command
-                        seenIndices.add(idx)
+                        seenIndices.add(idx)           # change seen indices to use a dictionary
         
         self.selectedFlags = selected
+    
+    #TODO def _repeatable():
+        
     
     def saveCommand(self):
         flagsStr = " ".join(f.get("flag", "") for f in self.selectedFlags)

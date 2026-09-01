@@ -93,3 +93,5 @@ python -m Mamushi.demo
 
  1. Quit command is not being recognized
  2. add colors 
+ 3. Lose of alignment when striking the words
+ 4. Change seen indices for a dictionary and add times you can repeat a flag in json
