@@ -73,7 +73,7 @@ class constructorModel:
         blocks = []
         for category in categories: 
             
-            block, globalIndex = self._renderCategoryBlock(category, globalIndex)
+            block, globalIndex = self._renderCategoryBlock(category, globalIndex, selectedFlagKeys)
             blocks.append(block)
             
         left = blocks[0::2]
@@ -115,6 +115,7 @@ class constructorModel:
     def _reset(self):
         
         self.userinput = ""
+        self.cursorPosition = 0
         self.matchedCommands = None
         self.selectedFlags = []
         
@@ -173,12 +174,17 @@ class constructorModel:
     
     @staticmethod
     
-    def _renderCategoryBlock(category: dict, startIndex: int):
+    def _renderCategoryBlock(category: dict, startIndex: int, selectedFlags: set):
         lines = [f"-- {category.get('name', "unable to find name")} --"]
         idx = startIndex
         for flag in category.get("flags", []):
             tag = flag.get("name", "")
             flag = flag.get("flag", "")
-            lines.append(f"{idx}) {tag} - ({flag})")
+            label = f"{idx}) {tag} - ({flag})"
+            
+            if flag in selectedFlags:
+                label = Colors.strikethrough(Colors.applyColor(label, Colors.RED))
+            
+            lines.append(label)
             idx += 1
         return lines, idx

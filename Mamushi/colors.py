@@ -45,7 +45,15 @@ class Colors:
     LIGHT_GRAY = TEXT[250]
     SILVER = TEXT[252]
 
+    #Text Modifiers
+    STRIKETHROUGH = "\033[9m"
+    
     @staticmethod
     def applyColor(string:str, color:str):
         return f"{color}{string}{Colors.RESET}"
+    
+    @staticmethod
+    def strikethrough(string: str):
+        return f"{Colors.STRIKETHROUGH}{string}{Colors.RESET}"
+    
     
