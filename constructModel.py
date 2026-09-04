@@ -71,14 +71,6 @@ class constructorModel:
         
         selectedFlagKeys = {flag.get("flag", ""):flag.get("count", NOT_DEFINED_REPETITIONS) for flag in self.selectedFlags} # 1 as a fallback for no specified number of repetitions 
         
-        if self._hasRepeatableFlags(commandData):
-            lines.append(
-                Colors.applyColor(
-                    f"{REPEAT_MARKER}(max N) = repeatable Flag, insert # of accumulations", Colors.RED
-                    )
-            )
-            lines.append("")
-        
         globalIndex = 1
         blocks = []
         for category in categories: 
@@ -169,6 +161,7 @@ class constructorModel:
                     if isRepeatable:
                         if counts[idx] < maxRepeats: #TODO < or <=
                             counts[idx] += 1
+
         
         selected = []
         for idx in order:
@@ -178,9 +171,6 @@ class constructorModel:
 
                             
         self.selectedFlags = selected
-    
-    #TODO def _repeatable():
-        
     
     def saveCommand(self):
         flagsStr = " ".join(f.get("flag", "") for f in self.selectedFlags)
