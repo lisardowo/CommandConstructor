@@ -95,3 +95,4 @@ python -m Mamushi.demo
  2. add colors 
  3. Lose of alignment when striking the words
  4. Change seen indices for a dictionary and add times you can repeat a flag in json
+ 5. This is not entirely a bug but (and maybe cause i didnt went deep enough in that) but when i needed to debug something in bubbletea i had to actually think in how to see debug values ( without counting the debugger itself) because I could not use directly prints because it was dissmissed by the architecture and wont renderize it or only do it when i closed the program and then it would not be helpful so maybe specific print functions that complete interrupt the render of the model and only renderize the asked values but keeping the functionality may be ool

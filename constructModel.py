@@ -9,6 +9,8 @@ from Mamushi.msg import keyMsg
 from Mamushi import commands
 from getMenu import loadCommands
 
+REPEAT_MARKER = " \u27f3"
+NOT_DEFINED_REPETITIONS = 1
 COLUMN_WIDTH = 60
 
 class constructorModel:
@@ -67,7 +69,15 @@ class constructorModel:
         categories = commandData.get("categories", [])
         
         
-        selectedFlagKeys = {flag.get("flag", "") for flag in self.selectedFlags}
+        selectedFlagKeys = {flag.get("flag", ""):flag.get("count", NOT_DEFINED_REPETITIONS) for flag in self.selectedFlags} # 1 as a fallback for no specified number of repetitions 
+        
+        if self._hasRepeatableFlags(commandData):
+            lines.append(
+                Colors.applyColor(
+                    f"{REPEAT_MARKER}(max N) = repeatable Flag, insert # of accumulations", Colors.RED
+                    )
+            )
+            lines.append("")
         
         globalIndex = 1
         blocks = []
@@ -141,17 +151,32 @@ class constructorModel:
         
         allFlags = self._flattenFlags(self.commandDatabase[self.matchedCommands])
         
-        selected = []
-        seenIndices = set()
+        order = []
+        counts = {}
         
         for token in tokens[1:]: #from 2nd element on because 0 is the command
             if token.isdigit():
                 idx = int(token) - 1
                 if 0 <= idx < len(allFlags):
-                    if idx not in seenIndices: #TODO or _repeatable(idx):
-                        selected.append(allFlags[idx]) # n from input should be an n in the range of all the flags of the command
-                        seenIndices.add(idx)           # change seen indices to use a dictionary
+                    flagData = allFlags[idx] # n from input should be an n in the range of all the flags of the command
+                    isRepeatable = self._isRepeatable(flagData)
+                    maxRepeats = self._maxReapeats(flagData)
+                
+                    if idx not in counts:
+                        counts[idx] = 0 
+                        order.append(idx) 
+                
+                    if isRepeatable:
+                        if counts[idx] < maxRepeats: #TODO < or <=
+                            counts[idx] += 1
         
+        selected = []
+        for idx in order:
+            flagData = dict(allFlags[idx])
+            flagData["count"] = counts[idx]
+            selected.append(flagData)
+
+                            
         self.selectedFlags = selected
     
     #TODO def _repeatable():
@@ -193,3 +218,31 @@ class constructorModel:
             lines.append(label)
             idx += 1
         return lines, idx
+    
+    @staticmethod
+    def _isRepeatable(flagData: dict) -> bool: # specific flag
+        if not flagData.get("repeatabla", False):
+            return False
+        return flagData.get("max_repeats", NOT_DEFINED_REPETITIONS) > 1 # comparing it to 1 prevents misconfigurations (P.E: the flag set as repeatable but it allows only 1 repeats (by definition is not repeatable)) 
+    
+    @staticmethod
+    def _maxReapeats(flagData: dict) -> int:
+        if not flagData.get("repeatable", False):
+            return 1
+        return flagData.get("max_repeats", NOT_DEFINED_REPETITIONS)
+    
+    @staticmethod
+    def _hasRepeatableFlags(commandData: dict) -> bool: # whole commmand
+        for category in commandData.get("categories", []):
+                for flag in category.get("flags", []):
+                    if flag.get("repeatable", False) and flag.get("max_repeats", 1 ) > 1:
+                        return True
+        return False
+    @staticmethod
+    def _buildFlagsString(selectedFlags: list) -> str:
+        parts = []
+        for f in selectedFlags:
+            count = f.get("count", 1)
+            parts.extend([f.get("flag", "")] * max(count, 1))
+        return " ".join(parts)
+    
