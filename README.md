@@ -50,6 +50,7 @@ No external dependencies are required. The project uses Python's standard `tty` 
 ~~ 6. nmap does not render 2 categories, prolly because it does not fill the whole column~~
  6.1 following up the sixth ticket, the cuantity of categories that are rendered depends on the size of the terminal (tiny terminal renders 2 or so while full size renders all the categories) 
  ~~7. two chars commands are being separated~~
+ 6. Still not repeating the commands that CAN be repeated 
 
 ## Setup
 
