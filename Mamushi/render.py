@@ -13,7 +13,7 @@ class Renderer:
         #setup the screen for drawing
         if self._useProgramScreen:
             terminal.enterProgramScreen()
-        #TODO cursor buggg terminal.hideCursor()
+        terminal.hideCursor() #TODO cursor buggg
         terminal.clearScreen()
         sys.stdout.flush() 
         

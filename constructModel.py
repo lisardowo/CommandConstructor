@@ -37,6 +37,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         
         
     def init(self): # loads the DB to memory
+                    #TODO on init the program should read history file and construct the history
         self.commandDatabase = loadCommands()
         return None
     
@@ -70,7 +71,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         return None
     
     def view(self) -> str:
-        lines = [f"> {self.userinput}", ""]
+        lines = [self._renderInputLine(), ""]
         
         if not self.matchedCommands:
             
@@ -183,7 +184,21 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
                     if isRepeatable:
                         if counts[idx] < maxRepeats: #TODO < or <=
                             counts[idx] += 1
-
+            elif ";" in token:
+                parts = token.split(";")
+                idx = int(parts[0]) - 1
+                if 0 <= idx < len(allFlags):
+                    
+                    flagData = allFlags[idx]
+                    maxRepeats = self._maxReapeats(flagData)
+                    
+                    if idx not in counts:
+                        counts[idx] = 0 
+                        order.append(idx)
+                    parts[1] = 3#TODO debug parts value
+                    if self._isRepeatable(flagData):
+                        if counts[idx] + int(parts[1]) <= maxRepeats: #TODO Less or less equal?
+                            counts[idx] += int(parts[1])
         
         selected = []
         for idx in order:
@@ -200,8 +215,13 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         commandStr = f"{self.matchedCommands} {flagsStr}".strip()
         
         description = self.commandDatabase.get(self.matchedCommands, {}).get("description", "")
+       
+        displayString = f"command: {commandStr}, description: {description},"
         
-        self.savedCommands.append({"command": commandStr, "description": description,})
+        self.savedCommands.append(displayString)
+    
+        with open(".commandsHist.txt", "a") as history:
+            history.write(displayString) #TODO read the history in the file when the tool start
     
     def insertInCursor(self, toInsert:str):
         self.userinput = self.userinput[: self.cursorPosition] + toInsert + self.userinput[self.cursorPosition :]
