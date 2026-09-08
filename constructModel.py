@@ -81,14 +81,23 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         commandData = self.commandDatabase[self.matchedCommands]
         categories = commandData.get("categories", [])
         
+        selectedCounts = {
+            flag.get("flag", ""): flag.get("count", 1) for flag in self.selectedFlags
+        }
         
-        selectedFlagKeys = {flag.get("flag", ""):flag.get("count", NOT_DEFINED_REPETITIONS) for flag in self.selectedFlags} # 1 as a fallback for no specified number of repetitions 
+        repeatHint = self._repeatableHint()
+        
+        if repeatHint:
+            lines.append(Colors.applyColor(repeatHint, Colors.YELLOW))
+            lines.append("")
+        
+        #selectedFlagKeys = {flag.get("flag", ""):flag.get("count", NOT_DEFINED_REPETITIONS) for flag in self.selectedFlags} # 1 as a fallback for no specified number of repetitions 
         
         globalIndex = 1
         blocks = []
         for category in categories: 
             
-            block, globalIndex = self._renderCategoryBlock(category, globalIndex, selectedFlagKeys)
+            block, globalIndex = self._renderCategoryBlock(category, globalIndex, selectedCounts)
             blocks.append(block)
             
         left = blocks[0::2] # this truncates to two columns
@@ -186,6 +195,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         self.selectedFlags = selected
     
     def saveCommand(self):
+        #TODO implement save to history file
         flagsStr = " ".join(f.get("flag", "") for f in self.selectedFlags)
         commandStr = f"{self.matchedCommands} {flagsStr}".strip()
         
@@ -215,4 +225,14 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
             idx += 1
         return lines, idx
 
-    
+    def _repeatableHint(self) -> str:
+        repeatableSelected = [f for f in self.selectedFlags if self._isRepeatable(f)]
+        if not repeatableSelected:
+            return ""
+        examples = []
+        for f in repeatableSelected:
+            examples.append(
+                f" {f.get('max_repeats', NOT_DEFINED_REPETITIONS)} times"
+            )#TODO show how to repeat (syntax) 
+        return "Selected flag is repeatable =>" + " | ".join(examples)
+
