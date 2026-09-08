@@ -4,7 +4,7 @@ from flags import flagsMixin
 from Mamushi import terminal
 from Mamushi.msg import keyType
 import itertools
-
+import re
 from Mamushi.colors import Colors
 from Mamushi.msg import keyMsg
 from Mamushi import commands
@@ -13,8 +13,19 @@ from getMenu import loadCommands
 REPEAT_MARKER = " \u27f3"
 NOT_DEFINED_REPETITIONS = 1
 COLUMN_WIDTH = 60
+ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-9;]*m")
 
-class constructorModel(flagsMixin):
+def _visibleLength(text: str) -> int:
+    return len(ANSI_ESCAPE_RE.sub("",text))
+    
+    
+def _visualLjust(text: str, width: int) -> str:
+    padding = width - _visibleLength(text)
+    if padding > 0 :
+        return text + (" " * padding)
+    return text
+
+class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the helpers methods for parsing and understanding the flags while keeping a cleaner code base 
    
     def __init__(self): # constructor of the object
         self.userinput = ""
@@ -80,7 +91,7 @@ class constructorModel(flagsMixin):
             block, globalIndex = self._renderCategoryBlock(category, globalIndex, selectedFlagKeys)
             blocks.append(block)
             
-        left = blocks[0::2]
+        left = blocks[0::2] # this truncates to two columns
         right = blocks[1::2]
         
         for categoryLeft, categoryRight in itertools.zip_longest(left,right, fillvalue = []):
@@ -94,7 +105,7 @@ class constructorModel(flagsMixin):
                     rightLine = categoryRight[i]
                 else:
                     rightLine = ""
-                lines.append(f"{leftLine.ljust(COLUMN_WIDTH)}{rightLine}") # todo update this to render sum colors
+                lines.append(f"{_visualLjust(leftLine, 70)}{rightLine}")
             lines.append("")
         
         if self.selectedFlags:
@@ -195,7 +206,7 @@ class constructorModel(flagsMixin):
         for flag in category.get("flags", []):
             tag = flag.get("name", "")
             flag = flag.get("flag", "")
-            label = f"{idx}) {tag} - ({flag})"
+            label = f"{idx}) {tag} - ({flag})" #get previous size, get new size, substract and apply the new difference as column width
             
             if flag in selectedFlags:
                 label = Colors.strikethrough(Colors.applyColor(label, Colors.RED))
@@ -203,3 +214,5 @@ class constructorModel(flagsMixin):
             lines.append(label)
             idx += 1
         return lines, idx
+
+    
