@@ -9,13 +9,7 @@ class flagsMixin:
             count = f.get("count", 1)
             parts.extend([f.get("flag", "")] * max(count, 1))
         return " ".join(parts)
-    @staticmethod
-    def _hasRepeatableFlags(commandData: dict) -> bool: # whole commmand
-        for category in commandData.get("categories", []):
-                for flag in category.get("flags", []):
-                    if flag.get("repeatable", False) and flag.get("max_repeats", 1 ) > 1:
-                        return True
-        return False
+
     @staticmethod
     def _isRepeatable(flagData: dict) -> bool: # specific flag
         if not flagData.get("repeatable", False):

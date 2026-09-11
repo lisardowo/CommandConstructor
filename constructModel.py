@@ -60,6 +60,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
             case keyType.ENTER:
                 if self.matchedCommands:
                     self.saveCommand() #TODO create func to save command
+                    #self._reset()
             case keyType.LEFT:
                 self.cursorPosition = max(0, self.cursorPosition - 1)
                 return None
@@ -215,7 +216,6 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         commandStr = f"{self.matchedCommands} {flagsStr}".strip()
         
         description = self.commandDatabase.get(self.matchedCommands, {}).get("description", "")
-       
         displayString = f"command: {commandStr}, description: {description},"
         
         self.savedCommands.append(displayString)
@@ -230,16 +230,33 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
 
     @staticmethod
     
-    def _renderCategoryBlock(category: dict, startIndex: int, selectedFlags: set):
-        lines = [f"-- {category.get('name', "unable to find name")} --"]
+    def _renderCategoryBlock(category: dict, startIndex: int, selectedCounts: set):
+        lines = [f"-- {category.get('name', 'name not found')} --"]
         idx = startIndex
         for flag in category.get("flags", []):
             tag = flag.get("name", "")
-            flag = flag.get("flag", "")
-            label = f"{idx}) {tag} - ({flag})" #get previous size, get new size, substract and apply the new difference as column width
             
-            if flag in selectedFlags:
-                label = Colors.strikethrough(Colors.applyColor(label, Colors.RED))
+            flagKey = flag.get("flag", "")
+            maxRepeats = flag.get("max_repeats", 1)
+            isRepeatable = flag.get("repeatable", False) and maxRepeats > 1
+            
+            marker = f"{REPEAT_MARKER}(max {maxRepeats})" if isRepeatable else ""
+            label = f"{idx}) {tag} - ({flagKey}){marker}"
+            
+            count = selectedCounts.get(flagKey, 0)
+            if count > 0:
+                if isRepeatable:
+                    
+                    isMaxed = count >= maxRepeats
+                    suffix = f" x{count}/{maxRepeats}"
+                    label = Colors.applyColor(f"{label}{suffix}", Colors.GREEN)
+                    
+                    if isMaxed:
+                        suffix += " (Max reached)"
+                        label = Colors.applyColor(label, Colors.RED)
+                        label = Colors.strikethrough(label)
+                else:
+                    label = Colors.strikethrough(Colors.applyColor(label, Colors.RED))
                 
             lines.append(label)
             idx += 1
