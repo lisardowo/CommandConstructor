@@ -121,7 +121,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         
         if self.selectedFlags:
             
-            flagsStr = " ".join(f.get("flag", "") for f in self.selectedFlags)
+            flagsStr = " ".join(self._buildFlagsString(self.selectedFlags))
             lines.append(f"> {self.matchedCommands} {flagsStr} ") #Construct the output command
         
         if self.savedCommands:
@@ -130,6 +130,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
                 lines.append(f" {saved['command']}")
                 if saved.get("description"):
                     lines.append(f" {saved['description']}")
+      
         return "\n".join(lines)
     
     def _renderInputLine(self) -> str:
@@ -171,36 +172,37 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         counts = {}
         
         for token in tokens[1:]: #from 2nd element on because 0 is the command
-            if token.isdigit():
-                idx = int(token) - 1
-                if 0 <= idx < len(allFlags):
-                    flagData = allFlags[idx] # n from input should be an n in the range of all the flags of the command
-                    isRepeatable = self._isRepeatable(flagData)
-                    maxRepeats = self._maxReapeats(flagData)
-                
-                    if idx not in counts:
-                        counts[idx] = 0 
-                        order.append(idx) 
-                
-                    if isRepeatable:
-                        if counts[idx] < maxRepeats: #TODO < or <=
-                            counts[idx] += 1
-            elif ";" in token:
-                parts = token.split(";")
-                idx = int(parts[0]) - 1
-                if 0 <= idx < len(allFlags):
-                    
-                    flagData = allFlags[idx]
-                    maxRepeats = self._maxReapeats(flagData)
-                    
-                    if idx not in counts:
-                        counts[idx] = 0 
-                        order.append(idx)
-                    parts[1] = 3#TODO debug parts value
-                    if self._isRepeatable(flagData):
-                        if counts[idx] + int(parts[1]) <= maxRepeats: #TODO Less or less equal?
-                            counts[idx] += int(parts[1])
-        
+            idxPart, hasCount, numberOfTimes = token.partition(";")
+            
+            # partitoin creates an array with idx(x) and count(y) [ x ; y]
+            
+            if not idxPart.isdigit():
+                continue
+            
+            idx = int(idxPart) - 1 # - 1 cause of zero indexed arrays normalization
+                        
+            if not ( 0 <= idx < len(allFlags)):
+                continue
+            
+            flagData = allFlags[idx]
+            isRepeatable = self._isRepeatable(flagData)
+            maxRepeats = self._maxReapeats(flagData)
+            
+            if idx not in counts:
+                counts[idx] = 0
+                order.append(idx)
+            
+            if hasCount and isRepeatable and numberOfTimes.isdigit():
+                requested = int(numberOfTimes)
+                counts[idx] = max(1, min(requested, maxRepeats))
+            
+            elif isRepeatable:
+                if counts[idx] < maxRepeats:
+                    counts[idx] += 1
+            
+            elif counts[idx] == 0:
+                counts[idx] = 1
+            
         selected = []
         for idx in order:
             flagData = dict(allFlags[idx])
