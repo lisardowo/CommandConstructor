@@ -10,6 +10,8 @@ from Mamushi.msg import keyMsg
 from Mamushi import commands
 from getMenu import loadCommands
 
+from modifiers import ModifierEngine, ViewMode
+
 REPEAT_MARKER = " \u27f3"
 NOT_DEFINED_REPETITIONS = 1
 COLUMN_WIDTH = 60
@@ -34,7 +36,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         self.selectedFlags = []
         self.commandDatabase = {}
         self.savedCommands = []
-        
+        self.modifiers = ModifierEngine()
         
     def init(self): # loads the DB to memory
                     #TODO on init the program should read history file and construct the history
@@ -47,13 +49,22 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         
         if msg.is_ctrl('q'):
             return commands.quit()
-      
+        
+        if msg.type == keyType.RUNES and self.modifiers.isTrigger(msg.runes) and not self.modifiers.isActive:
+            self.modifiers.activate()
+            return None
+        
+        if self.modifiers.isActive:
+            self._handleModifierKey(msg)
+            return None
+
         match msg.type:
             case keyType.BACKSPACE:
                 if self.cursorPosition > 0:
                     self.userinput = (self.userinput[:self.cursorPosition - 1] + self.userinput[self.cursorPosition:]) 
                     self.cursorPosition -=1
             case keyType.SPACE: 
+                self._maybeStripRedundantToken()
                 self.insertInCursor(' ')
             case keyType.RUNES:
                 self.insertInCursor(msg.runes)
@@ -73,7 +84,15 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
     
     def view(self) -> str:
         lines = [self._renderInputLine(), ""]
+
+        if self.modifiers.isActive:
+            lines.append(self.modifiers.renderPopup())
         
+        if self.modifiers.lastMessage:
+            color = Colors.GREEN if self.modifiers.lastWasError else Colors.RED
+            lines.append(Colors.applyColor(self.modifiers.lastMessage, color))
+            lines.append("")
+
         if not self.matchedCommands:
             
             lines.append(Colors.applyColor("Command not recognized !", Colors.BRIGHT_RED))
@@ -121,7 +140,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         
         if self.selectedFlags:
             
-            flagsStr = " ".join(self._buildFlagsString(self.selectedFlags))
+            flagsStr = "".join(self._buildFlagsString(self.selectedFlags))
             lines.append(f"> {self.matchedCommands} {flagsStr} ") #Construct the output command
         
         if self.savedCommands:
@@ -186,7 +205,7 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
             
             flagData = allFlags[idx]
             isRepeatable = self._isRepeatable(flagData)
-            maxRepeats = self._maxReapeats(flagData)
+            maxRepeats = self._maxRepeats(flagData)
             
             if idx not in counts:
                 counts[idx] = 0
@@ -229,6 +248,71 @@ class constructorModel(flagsMixin): # Uses inheritance of the mixin to use the h
         self.userinput = self.userinput[: self.cursorPosition] + toInsert + self.userinput[self.cursorPosition :]
         self.cursorPosition += len(toInsert)
 
+    def _maybeStripRedundantToken(self):
+        if self.matchedCommands is None:
+            return
+        
+        textBeforeCursor = self.userinput[: self.cursorPosition]
+        tokens = textBeforeCursor.split()
+        
+        if len(tokens) < 2:
+            return
+        
+        lastToken = tokens[-1]
+        
+        if ";" in lastToken or not lastToken.isdigit():
+            return
+        
+        priorTokens = tokens[1:-1]  # todo lo ya confirmado, sin el comando ni el token actual
+        
+        if not self._tokenIsRedundant(lastToken, priorTokens):
+            return
+        
+        lastSpaceIdx = textBeforeCursor.rfind(" ")
+        tokenStart = lastSpaceIdx + 1 if lastSpaceIdx != -1 else 0
+
+        before = self.userinput[:tokenStart].rstrip()
+        after = self.userinput[self.cursorPosition:]
+        self.userinput = before + after
+        self.cursorPosition = len(before)
+
+    def _tokenIsRedundant(self, token: str, priorTokens: list) -> bool:
+
+        allFlags = self._flattenFlags(self.commandDatabase[self.matchedCommands])
+        idx = int(token) - 1
+        if not (0 <= idx < len(allFlags)):
+            return False
+        
+        flagData = allFlags[idx]
+        isRepeatable = self._isRepeatable(flagData)
+        maxRepeats = self._maxRepeats(flagData)
+
+        count = 0
+        for priorToken in priorTokens:
+            priorIdxPart, priorHasCount, priorCountPart = priorToken.partition(";")
+            if not priorIdxPart.isdigit() or int(priorIdxPart) - 1 != idx:
+                continue
+            if priorHasCount and priorCountPart.isdigit():
+                count = max(1, min(int(priorCountPart), maxRepeats))
+            elif isRepeatable:
+                count = min(count + 1, maxRepeats)
+            else:
+                count = 1
+        
+        if isRepeatable:
+            return count >= maxRepeats
+        return count >= 1
+
+    def _handleModifierKey(self, msg):
+
+        if msg.type == keyType.ENTER:
+            self.modifiers.execute()
+        elif msg.type == keyType.BACKSPACE:
+            self.modifiers.backspace()
+        elif msg.type == keyType.SPACE:
+            self.modifiers.cancel()
+        elif msg.type == keyType.RUNES:
+            self.modifiers.feedChar(msg.runes)
 
     @staticmethod
     

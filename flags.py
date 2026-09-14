@@ -17,7 +17,7 @@ class flagsMixin:
         return flagData.get("max_repeats", NOT_DEFINED_REPETITIONS) > 1 # comparing it to 1 prevents misconfigurations (P.E: the flag set as repeatable but it allows only 1 repeats (by definition is not repeatable)) 
     
     @staticmethod
-    def _maxReapeats(flagData: dict) -> int:
+    def _maxRepeats(flagData: dict) -> int:
         if not flagData.get("repeatable", False):
             return 1
         return flagData.get("max_repeats", NOT_DEFINED_REPETITIONS)
