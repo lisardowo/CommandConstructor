@@ -7,7 +7,11 @@ class flagsMixin:
         parts = []
         for f in selectedFlags:
             count = f.get("count", 1)
-            parts.extend([f.get("flag", "")] * max(count, 1))
+            flag = f.get("flag", "")
+            if count > 1:
+                parts.append(f"{flag}{count}")
+            else:
+                parts.append(flag) # This WILL duplicate the flag
         return " ".join(parts)
 
     @staticmethod
@@ -28,3 +32,13 @@ class flagsMixin:
         for category in commandData.get("categories", []):
             flags.extend(category.get("flags", []))
         return flags
+    
+    
+if __name__ == '__main__':
+    flags = [
+        {"flag": "--verbose", "count": 2},
+        {"flag": "--retry", "count": 0}
+    ]
+    test = flagsMixin()
+    
+    print(test._buildFlagsString(flags)) 
